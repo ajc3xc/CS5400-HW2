@@ -40,21 +40,16 @@ class dungeon_game(game_board):
         #data structure to store queue of options
         queue = [{'initial_move': option, 'current_move': option, 'turns': 0, 'game_board': game_board(grid=self.grid, turn_count=self.turn_count, points=self.points, moves=self.moves)} for option in valid_options]
 
+        #testing iterating through queue
+        selected_option = None
         
-        #testing moving act man on temporary board
-        move = 8
-        temp_game_state = game_board(grid=self.grid)
-        temp_game_state._move_actman(move)
-        print("...")
-        temp_game_state._pprint_game_state()
-        print(temp_game_state.game_state)
-        print()
-        #keep going through the queue until the goal condition is met
-        '''while True:
-            current_item = queue.pop(0)
-            if turns
-            if True:
-                break'''
+        #iterate through the loop until goal condition met or queue becomes empty
+        while queue:
+            option: dict = queue.pop(0)
+        #contingency if queue becomes empty and goal is not empty
+        else:
+            print("No good option found. Choosing option at random")
+            selected_option = random.choice(valid_options)
 
         selected_option = random.choice(valid_options)
         self._move_actman(move=selected_option)                
