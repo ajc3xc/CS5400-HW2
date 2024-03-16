@@ -38,14 +38,17 @@ class dungeon_game(game_board):
         valid_options = self._get_valid_options(self.act_man)
 
         #data structure to store queue of options
-        queue = [{'initial_move': option, 'current_move': option, 'turns': 0, 'game_board': game_board(grid=self.grid, turn_count=self.turn_count, points=self.points)} for option in valid_options]
+        queue = [{'initial_move': option, 'current_move': option, 'turns': 0, 'game_board': game_board(grid=self.grid, turn_count=self.turn_count, points=self.points, moves=self.moves)} for option in valid_options]
 
         
         #testing moving act man on temporary board
         move = 8
-        temp_game_state = game_board(grid=self.grid, turn_count=self.turn_count, points=self.points)
+        temp_game_state = game_board(grid=self.grid)
         temp_game_state._move_actman(move)
+        print("...")
+        temp_game_state._pprint_game_state()
         print(temp_game_state.game_state)
+        print()
         #keep going through the queue until the goal condition is met
         '''while True:
             current_item = queue.pop(0)
@@ -54,7 +57,6 @@ class dungeon_game(game_board):
                 break'''
 
         selected_option = random.choice(valid_options)
-        self.moves += str(selected_option)
         self._move_actman(move=selected_option)                
     
     def _play_turn(self):    
@@ -81,6 +83,7 @@ class dungeon_game(game_board):
         
         #initial state should already be printed
         #prints the game state at the end of each turn
+        print()
         print(f"End of Turn {self.turn_count}")
         self._pprint_game_state()
         #exit out of the loop since you won the game
@@ -90,13 +93,15 @@ class dungeon_game(game_board):
     def play_game(self):
         print("Initial Board State")
         self._pprint_game_state()
+        print()
         
         while self.game_state == "playing":
             self._play_turn()
             #comment / remove break to run full game
             break
         
-        #print game state for last turn   
+        #print game state for last turn
+        print() 
         print(f"Final Board State: End of Turn {self.turn_count}")
         self._pprint_game_state()
         

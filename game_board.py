@@ -6,13 +6,14 @@ from math import sqrt
 #game state class to store temporary boards for bfs
 #need to have everything to move the board independently of act man making a decision to move
 class game_board():
-    def __init__(self, grid: List[List]=None, turn_count: int=None, points: int=None):    
+    def __init__(self, grid: List[List]=None, turn_count: int=0, points: int=50, moves: str=''):    
         self.grid = grid
         self.turn_count = turn_count
         #keep track of current game state
         #victory, defeat or playing. Used for BFS
         self.game_state = "playing"
         self.points = points
+        self.moves = moves
         self.act_man = None
         self.monsters = {}
         monsters_index = 0
@@ -31,8 +32,8 @@ class game_board():
     #debugging function for seeing current board state
     def _pprint_game_state(self):
         self._update_board()
-        print(self.moves)
-        print(self.points)
+        print(f"Moves: {self.moves}")
+        print(f"Points: {self.points}")
         for line in self.grid:
             print(''.join(line))
     
@@ -215,6 +216,8 @@ class game_board():
         assert move in valid_options,   f"{move} not in valid options {valid_options}"
         #select an item from the valid options randomly
         
+        #add to moves string
+        self.moves += str(move)
         if move in self.act_man.bullet_options:
             self._fire_bullet(move)
         else:
