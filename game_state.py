@@ -11,7 +11,7 @@ class game_state():
         self.turn_count = turn_count
         #keep track of current game state
         #victory, defeat or playing. Used for BFS
-        game_state = "playing"
+        self.game_state = "playing"
         self.act_man = None
         self.monsters = {}
         monsters_index = 0
@@ -27,6 +27,9 @@ class game_state():
                     monsters_index += 1
     
     def _kill_monster(self, monster_index):
+        if not self.monsters:
+            self.game_state = "victory"
+            return
         monster_row, monster_col = self.monsters[monster_index].current_position
         self.grid[monster_row][monster_col] = '@'
         del self.monsters[monster_index]
@@ -98,3 +101,98 @@ class game_state():
         
         #delete all monsters that are in the same collision space
         [self._kill_monster(index) for index in monsters_to_remove]
+
+    
+        #function to kill act man
+    def _kill_actman(self):
+        self.points = 0
+        #the game logic for showing the pieces is probably the most error prone
+        #I just don't care now
+        self.act_man.is_alive = False
+        self._update_board()
+        self.game_state = "defeat"
+    
+    #function to pick a valid move at random 
+    def _get_valid_options(self, character: character):
+        valid_movements = []
+        #start coordinate[0] is row, start_coordinate[1] is column
+        #have safety to ensure that you can't go out of bounds
+        #I'm going to be cheap and check that you aren't along the edge of the game
+        #(i.e. 0 or n -1 for row or column). Also assume list of lists is rectangular    
+        assert character.current_position[0] > 0 and character.current_position[0] < len(self.grid) - 1 and character.current_position[1] > 0 and character.current_position[1] < len(self.grid[0]) - 1,\
+            f"{character.current_position} is out of bounds!"
+            
+        valid_options = []
+        #add valid movements to list
+        #i.e. ones that are not a wall
+        for key, movement in character.movement_translator.items():
+            if self.grid[character.current_position[0] + movement[0]][character.current_position[1] + movement[1]] != '#':
+                valid_options.append(key)
+        
+        #safety check (ensure there is at least 1 valid movement)
+        assert valid_options, "No valid movements found"
+        
+        #actman only
+        #can only fire bullet once
+        if isinstance(character, act_man) and not character.fired_bullet:
+            valid_options += character.bullet_options
+        
+        return valid_options
+    
+    #assume direction is N, S, E or W
+    def _fire_bullet(self, direction):
+        act_man_row, act_man_col = self.act_man.current_position[0], self.act_man.current_position[1]
+        if direction == 'N':
+            row_range = list(range(act_man_row - 1, -1, -1))
+            col_range = [act_man_col]
+        elif direction == 'S':
+            row_range = range(act_man_row + 1, len(self.grid))
+            col_range = [act_man_col]
+        elif direction == 'W':
+            row_range = [act_man_row]
+            col_range = range(act_man_col - 1, -1, -1)
+        elif direction == 'E':
+            row_range = [act_man_row]
+            col_range = range(act_man_col + 1, len(self.grid[0]))
+        
+        #20 points lost when bullet is fired
+        self.points -= 20
+        #since break only gets out of one loop, returning immediately will be necessary   
+        indexes_to_remove = []
+        stop = False #variable to exit out of both inner and outer for loop
+        
+        #move the death beam until it hits a wall, kill any monsters in the way
+        for row in row_range:
+            if stop: break
+            for col in col_range:
+                #print((row, col))
+                if self.grid[row][col] == '#':
+                    stop = True
+                    break
+                #check if monster in cell
+                monster_types = ['D', 'G']
+                if self.grid[row][col] in monster_types:
+                    for index, monster in self.monsters.items():
+                        if monster.current_position == (row, col):
+                            indexes_to_remove.append(index)
+        #can't fire any more bullets
+        map(self._kill_monster, indexes_to_remove)
+        self.act_man.fired_bullet = True
+    
+    def _move_actman(self, move: str):
+        valid_options = self._get_valid_options(self.act_man)
+        
+        assert move not in valid_options:   f"{move} not in valid options {valid_options}"
+        #select an item from the valid options randomly
+        
+        if move in self.act_man.bullet_options:
+            self._fire_bullet(move)
+        else:
+            #update act man's position
+            self.act_man.current_position = tuple(sum(values) for values in zip(self.act_man.current_position, self.act_man.movement_translator[move]))
+            #check if there's a monster or a corpse there
+            #assume that corpses are static and can't move
+            if any(monster.current_position == self.act_man.current_position for monster in self.monsters.values()) or self.grid[self.act_man.current_position[0]][self.act_man.current_position[1]] == '@':
+                self._kill_actman()
+            else:
+                self.points -= 1
