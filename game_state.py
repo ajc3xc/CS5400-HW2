@@ -1,7 +1,7 @@
+#!/usr/bin/python3
 from character import character, monster, act_man
 from typing import Tuple, List
 from math import sqrt
-import random
 
 #game state class to store temporary boards for bfs
 #need to have everything to move the board independently of act man making a decision to move
@@ -12,6 +12,7 @@ class game_state():
         #keep track of current game state
         #victory, defeat or playing. Used for BFS
         self.game_state = "playing"
+        self.points = points
         self.act_man = None
         self.monsters = {}
         monsters_index = 0
@@ -179,10 +180,10 @@ class game_state():
         map(self._kill_monster, indexes_to_remove)
         self.act_man.fired_bullet = True
     
-    def _move_actman(self, move: str):
+    def _move_actman(self, move: str=None):
         valid_options = self._get_valid_options(self.act_man)
         
-        assert move not in valid_options:   f"{move} not in valid options {valid_options}"
+        assert move in valid_options,   f"{move} not in valid options {valid_options}"
         #select an item from the valid options randomly
         
         if move in self.act_man.bullet_options:

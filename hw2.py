@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import os, sys
-import game_state
+from game_state import game_state
+import random
     
 class dungeon_game(game_state):
     def __init__(self):
@@ -57,9 +58,9 @@ class dungeon_game(game_state):
     def _choose_and_move_actman(self):
         valid_options = self._get_valid_options(self.act_man)
 
-        selected_option = None
+        selected_option = random.choice(valid_options)
         self.moves += str(selected_option)
-        self._move_actman(selected_option)                
+        self._move_actman(move=selected_option)                
     
     def _play_turn(self):    
         #not sure if sys exiting will cause an error in the program
@@ -70,14 +71,14 @@ class dungeon_game(game_state):
         if self.points <= 0:
             self._kill_actman()
         #game end check
-        if not self.playing: return
+        if self.game_state != "playing": return
         
         #increment turn count pre_emptively,
         #in case act man killed by demons or demons get killed
         self.turn_count += 1
         #move act man
-        self._move_actman()
-        if game_state != "playing": return 
+        self._choose_and_move_actman()
+        if self.game_state != "playing": return 
         
         #move the monsters
         self._move_monsters()
@@ -97,7 +98,7 @@ class dungeon_game(game_state):
         while self.game_state == "playing":
             self._play_turn()
             #comment / remove break to run full game
-            #break
+            break
         
         #print game state for last turn   
         print(f"Final Board State: End of Turn {self.turn_count}")
@@ -111,6 +112,3 @@ class dungeon_game(game_state):
 new_dungeon = dungeon_game()
 new_dungeon.play_game()
 #new_dungeon._play_turn()
-
-class gameState():
-    def __init__
