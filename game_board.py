@@ -51,15 +51,20 @@ class game_board():
         else: self.grid[self.act_man.current_position[0]][self.act_man.current_position[1]] = 'X'
         return
     
+    #'waste management' function
     def _kill_monster(self, monster_index):
-        if not self.monsters:
-            self.game_state = "victory"
-            return
+        #replace the monster in the grid with a corpse, delete from list of monsters
         monster_row, monster_col = self.monsters[monster_index].current_position
         self.grid[monster_row][monster_col] = '@'
         del self.monsters[monster_index]
+
         #five points gained if monster is killed
         self.points += 5
+
+        #check if there are any monsters left after you killed a monster
+        if not self.monsters:
+            self.game_state = "victory"
+            return
         
     def _move_monsters(self):
         #quick utility function

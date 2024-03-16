@@ -46,6 +46,18 @@ class dungeon_game(game_board):
         #iterate through the loop until goal condition met or queue becomes empty
         while queue:
             option: dict = queue.pop(0)
+            #move act man and move the monsters
+            option['game_board']._move_actman(option['current_move'])
+            option['game_board']._move_monsters()
+
+            #did act man die from doing this action?
+            if option['game_board'].game_state == 'defeat':
+                continue
+            #did act man kill all the monsters (thereby winning)?
+            #is act man still alive after 7 turns (i.e. 6 turns plus this one)?
+            if option['game_board'].game_state == 'victory' or option['turns'] == 6:
+                selected_option = option['current_move']
+                break
         #contingency if queue becomes empty and goal is not empty
         else:
             print("No good option found. Choosing option at random")
