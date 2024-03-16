@@ -38,17 +38,19 @@ class dungeon_game(game_board):
         valid_options = self._get_valid_options(self.act_man)
 
         #data structure to store queue of options
-        queue = [{'initial_move': option, 'current_move': option, 'turns': 0, 'game_board': game_board(grid=self.grid, turn_count=self.turn_count, points=self.points, moves=self.moves)} for option in valid_options]
+        queue = [{'initial_move': option, 'current_move': option, 'turns': 6, 'game_board': game_board(grid=self.grid, turn_count=self.turn_count, points=self.points, moves=self.moves)} for option in valid_options]
 
         #testing iterating through queue
         selected_option = None
         
-        print(valid_options)
+        #print(valid_options)
         #iterate through the loop until goal condition met or queue becomes empty
         while queue:
             option: dict = queue.pop(0)
             #move act man and move the monsters
+            #print(option['game_board'].act_man.current_position)
             option['game_board']._move_actman(option['current_move'])
+            #print(option['game_board'].act_man.current_position)
             option['game_board']._move_monsters()
             #print(len(option['game_board'].monsters))
 
@@ -57,17 +59,20 @@ class dungeon_game(game_board):
                 continue
             #did act man kill all the monsters (thereby winning)?
             #is act man still alive after 7 turns (i.e. 6 turns plus this one)?
-            if option['game_board'].game_state == 'victory' or option['turns'] == 6:
+            elif option['game_board'].game_state == 'victory' or option['turns'] == 6:
                 print("Found a good move")
+                print(option['current_move'])
                 selected_option = option['current_move']
                 break
+            else:
+                pass
+
         #contingency if queue becomes empty and goal is not empty
         else:
             print("No good option found. Choosing option at random")
             selected_option = random.choice(valid_options)
 
-        self._move_actman(move=selected_option)
-        print(len(self.monsters))             
+        self._move_actman(move=selected_option)            
     
     def _play_turn(self):    
         #not sure if sys exiting will cause an error in the program
