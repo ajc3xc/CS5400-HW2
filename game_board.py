@@ -27,6 +27,15 @@ class game_board():
                     self.monsters[monsters_index] = monster((i, j), 'D')
                     monsters_index += 1
     
+                
+    #debugging function for seeing current board state
+    def _pprint_game_state(self):
+        self._update_board()
+        print(self.moves)
+        print(self.points)
+        for line in self.grid:
+            print(''.join(line))
+    
     #function to update board state after pieces have been moved
     def _update_board(self):
         # Replace 'A', 'G', 'D' with '  ' using a nested list comprehension

@@ -33,14 +33,6 @@ class dungeon_game(game_board):
             output_file.write(f"{self.points}\n")
             for line in self.grid:
                 output_file.write(f"{''.join(line)}\n")
-            
-    #debugging function for seeing current board state
-    def _pprint_game_state(self):
-        self._update_board()
-        print(self.moves)
-        print(self.points)
-        for line in self.grid:
-            print(''.join(line))
                    
     def _choose_and_move_actman(self):
         valid_options = self._get_valid_options(self.act_man)
