@@ -53,7 +53,6 @@ class game_board():
     
     #'waste management' function
     def _kill_monster(self, monster_index):
-        print("!!")
         #replace the monster in the grid with a corpse, delete from list of monsters
         monster_row, monster_col = self.monsters[monster_index].current_position
         self.grid[monster_row][monster_col] = '@'
