@@ -66,7 +66,8 @@ class dungeon_game(game_board):
             print("No good option found. Choosing option at random")
             selected_option = random.choice(valid_options)
 
-        self._move_actman(move=selected_option)              
+        self._move_actman(move=selected_option)
+        print(len(self.monsters))             
     
     def _play_turn(self):    
         #not sure if sys exiting will cause an error in the program

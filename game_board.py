@@ -2,12 +2,13 @@
 from character import character, monster, act_man
 from typing import Tuple, List
 from math import sqrt
+from copy import deepcopy
 
 #game state class to store temporary boards for bfs
 #need to have everything to move the board independently of act man making a decision to move
 class game_board():
     def __init__(self, grid: List[List]=None, turn_count: int=0, points: int=50, moves: str=''):    
-        self.grid = grid
+        self.grid = deepcopy(grid)
         self.turn_count = turn_count
         #keep track of current game state
         #victory, defeat or playing. Used for BFS
@@ -53,6 +54,7 @@ class game_board():
     
     #'waste management' function
     def _kill_monster(self, monster_index):
+        print("!")
         #replace the monster in the grid with a corpse, delete from list of monsters
         monster_row, monster_col = self.monsters[monster_index].current_position
         self.grid[monster_row][monster_col] = '@'
@@ -209,6 +211,7 @@ class game_board():
                 if self.grid[row][col] in monster_types:
                     for index, monster in self.monsters.items():
                         if monster.current_position == (row, col):
+                            print(".")
                             indeces_to_remove.append(index)
         
         #kill all the monsters hit by a bullet
