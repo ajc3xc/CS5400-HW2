@@ -53,6 +53,7 @@ class game_board():
     
     #'waste management' function
     def _kill_monster(self, monster_index):
+        print("!!")
         #replace the monster in the grid with a corpse, delete from list of monsters
         monster_row, monster_col = self.monsters[monster_index].current_position
         self.grid[monster_row][monster_col] = '@'
@@ -64,7 +65,6 @@ class game_board():
         #check if there are any monsters left after you killed a monster
         if not self.monsters:
             self.game_state = "victory"
-            return
         
     def _move_monsters(self):
         #quick utility function
@@ -194,7 +194,7 @@ class game_board():
         #20 points lost when bullet is fired
         self.points -= 20
         #since break only gets out of one loop, returning immediately will be necessary   
-        indexes_to_remove = []
+        indeces_to_remove = []
         stop = False #variable to exit out of both inner and outer for loop
         
         #move the death beam until it hits a wall, kill any monsters in the way
@@ -210,9 +210,12 @@ class game_board():
                 if self.grid[row][col] in monster_types:
                     for index, monster in self.monsters.items():
                         if monster.current_position == (row, col):
-                            indexes_to_remove.append(index)
-        #can't fire any more bullets
-        map(self._kill_monster, indexes_to_remove)
+                            indeces_to_remove.append(index)
+        
+        #kill all the monsters hit by a bullet
+        [self._kill_monster(index) for index in indeces_to_remove]
+
+        #can only fire bullet once
         self.act_man.fired_bullet = True
     
     def _move_actman(self, move: str=None):
