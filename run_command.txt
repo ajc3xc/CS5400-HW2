@@ -1,0 +1,3 @@
+./run.sh gradinginput.txt gradingoutput.txt
+#run this command
+./run.sh dungeon0.in.txt output.txt
