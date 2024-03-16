@@ -5,7 +5,7 @@ from math import sqrt
 
 #game state class to store temporary boards for bfs
 #need to have everything to move the board independently of act man making a decision to move
-class game_state():
+class game_board():
     def __init__(self, grid: List[List]=None, turn_count: int=None, points: int=None):    
         self.grid = grid
         self.turn_count = turn_count
@@ -26,6 +26,20 @@ class game_state():
                 elif self.grid[i][j] == 'D':
                     self.monsters[monsters_index] = monster((i, j), 'D')
                     monsters_index += 1
+    
+    #function to update board state after pieces have been moved
+    def _update_board(self):
+        # Replace 'A', 'G', 'D' with '  ' using a nested list comprehension
+        self.grid = [[' ' if element in ['A', 'G', 'D'] else element for element in line] for line in self.grid]
+        
+        #show all living demons' positions on the board (will be alive if in list)
+        for monster in self.monsters.values(): self.grid[monster.current_position[0]][monster.current_position[1]] = monster.monster_type
+        
+        #show act man's current position on board if he's alive
+        #if a demon is in the same position as act man, then act man's dead X should show over the demon
+        if self.act_man.is_alive: self.grid[self.act_man.current_position[0]][self.act_man.current_position[1]] = 'A'
+        else: self.grid[self.act_man.current_position[0]][self.act_man.current_position[1]] = 'X'
+        return
     
     def _kill_monster(self, monster_index):
         if not self.monsters:
@@ -102,6 +116,12 @@ class game_state():
         
         #delete all monsters that are in the same collision space
         [self._kill_monster(index) for index in monsters_to_remove]
+
+        #check that actman's score is >= 0 at the end of a turn
+        #this is built into monsters function because of bfs
+        #since 'game ends' when score <= 0, I'm default to saying act man dies
+        if self.points <= 0:
+            self._kill_actman()
 
     
         #function to kill act man
