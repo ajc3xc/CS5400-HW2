@@ -46,6 +46,7 @@ class dungeon_game(game_board):
         
         #print(valid_options)
         #iterate through the loop until goal condition met or queue becomes empty
+        #It takes a LONG time to play the entire game because of this.
         while queue:
             state: dict = queue.pop(0)
             #move act man and move the monsters
@@ -61,13 +62,14 @@ class dungeon_game(game_board):
             #is act man still alive after 7 turns (i.e. 6 turns plus this one)?
             elif state['game_board'].game_state == 'victory' or state['game_board'].turn_count >= 7:
                 #print("Found a good move")
-                #print(option['current_move'])
+                #print(state['current_move'])
                 selected_option = state['current_move']
                 break
             else:
+              #get valid new options from this position, add to tail end of new options queue
               valid_new_options = state['game_board']._get_valid_options(state['game_board'].act_man)
-              new_options = [{"initial_move": state['current_move'], "current_move": new_option, 'game_board': deepcopy(state['game_board'])} for new_option in valid_new_options]
-              print(new_options)
+              new_branch = [{"initial_move": state['current_move'], "current_move": new_option, 'game_board': deepcopy(state['game_board'])} for new_option in valid_new_options]
+              queue.extend(new_branch)
 
         #contingency if queue becomes empty and goal is not empty
         else:
@@ -115,7 +117,7 @@ class dungeon_game(game_board):
         while self.game_state == "playing":
             self._play_turn()
             #comment / remove break to run full game
-            break
+            #break
         
         #print game state for last turn
         print() 
@@ -128,5 +130,5 @@ class dungeon_game(game_board):
     
 
 new_dungeon = dungeon_game()
-#new_dungeon.play_game()
-new_dungeon._play_turn()
+new_dungeon.play_game()
+#new_dungeon._play_turn()
