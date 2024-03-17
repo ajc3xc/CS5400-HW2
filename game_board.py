@@ -63,7 +63,8 @@ class game_board():
         self.points += 5
 
         #check if there are any monsters left after you killed a monster
-        if not self.monsters:
+        #also make sure that you didn't kill act man first
+        if not self.monsters and self.act_man.is_alive:
             self.game_state = "victory"
         
     def _move_monsters(self):
@@ -82,7 +83,6 @@ class game_board():
                 potential_move = tuple(sum(values) for values in zip(monster.current_position, monster.movement_translator[option]))
                 act_man_distance = euclidean_distance(potential_move, self.act_man.current_position)
                 if act_man_distance < minimum_distance:
-                    #print(f"{option} {act_man_distance} {potential_move} {self.act_man.current_position}")
                     minimum_values = [option]
                     minimum_distance = act_man_distance
                 elif act_man_distance == minimum_distance:
@@ -105,7 +105,9 @@ class game_board():
             monster.current_position = tuple(sum(values) for values in zip(monster.current_position, monster.movement_translator[selected_move]))
             #check if any monsters, corpses or actman are in the new position
             #moved into act man
-            if self.act_man.current_position == monster.current_position: self._kill_actman()
+            if self.act_man.current_position == monster.current_position:
+                self._kill_actman()
+                return
             #moved into corpse
             #because I can't delete the monster
             elif self.grid[monster.current_position[0]][monster.current_position[1]] == '@': monsters_to_remove.append(index)
@@ -136,13 +138,14 @@ class game_board():
             self._kill_actman()
 
     
-        #function to kill act man
+    #function to kill act man
     def _kill_actman(self):
         self.points = 0
         #the game logic for showing the pieces is probably the most error prone
         #I just don't care now
         self.act_man.is_alive = False
         self._update_board()
+        #if act man dies, the game is lost
         self.game_state = "defeat"
     
     #function to pick a valid move at random 
@@ -215,13 +218,13 @@ class game_board():
         self.act_man.fired_bullet = True
     
     def _move_actman(self, move: str=None):
+        #ensure the move selected is valid
         valid_options = self._get_valid_options(self.act_man)
-        
         assert move in valid_options,   f"{move} not in valid options {valid_options}"
-        #select an item from the valid options randomly
         
-        #add to moves string
+        #add moves to string of all moves made
         self.moves += str(move)
+        #fire a bullet if a selection to fire the bullet was made. Otherwise, move act man
         if move in self.act_man.bullet_options:
             self._fire_bullet(move)
         else:
@@ -229,6 +232,7 @@ class game_board():
             self.act_man.current_position = tuple(sum(values) for values in zip(self.act_man.current_position, self.act_man.movement_translator[move]))
             #check if there's a monster or a corpse there
             #assume that corpses are static and can't move
+            #since act man's points will be set to 0 if he dies, subtracting points will make the result negative
             if any(monster.current_position == self.act_man.current_position for monster in self.monsters.values()) or self.grid[self.act_man.current_position[0]][self.act_man.current_position[1]] == '@':
                 self._kill_actman()
             else:
