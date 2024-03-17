@@ -56,10 +56,10 @@ class dungeon_game(game_board):
             state['game_board'].turn_count += 1
 
             #did act man die from doing this action?
-            if state['game_board'].game_state == 'defeat':
+            if state['game_board'].game_state == "defeat":
                 continue
             #did act man kill all the monsters (thereby winning)?
-            elif state['game_board'].game_state == 'victory':
+            elif state['game_board'].game_state == "victory":
                 print(f"Found winning move {state['initial_move']}")
                 selected_option = state['initial_move']
                 break
@@ -67,7 +67,7 @@ class dungeon_game(game_board):
             #in case we aren't able to find a series of winning moves within 7 turns,
             #get the last option where he survives 7 moves
             elif state['game_board'].turn_count >= 7:
-                selected_option = state['initial_move']
+                if not selected_option: selected_option = state['initial_move']
             #otherwise, keep adding the moves to the queue
             else:
               #get valid new options from this position, add to tail end of new options queue
@@ -135,5 +135,5 @@ class dungeon_game(game_board):
     
 
 new_dungeon = dungeon_game()
-#new_dungeon.play_game()
-new_dungeon._play_turn()
+new_dungeon.play_game()
+#new_dungeon._play_turn()
