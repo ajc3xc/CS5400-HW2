@@ -99,7 +99,7 @@ class dungeon_game(game_board):
         #in case act man killed by demons or demons get killed
         self.turn_count += 1
         #move act man
-        self._choose_and_move_actman()
+        #self._choose_and_move_actman()
         if self.game_state != "playing": return
         
         #move the monsters
@@ -135,5 +135,5 @@ class dungeon_game(game_board):
     
 
 new_dungeon = dungeon_game()
-new_dungeon.play_game()
-#new_dungeon._play_turn()
+#new_dungeon.play_game()
+new_dungeon._play_turn()

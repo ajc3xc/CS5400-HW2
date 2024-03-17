@@ -69,13 +69,12 @@ class game_board():
     def _move_monsters(self):
         #quick utility function
         def euclidean_distance(coord1: Tuple[int], coord2: Tuple[int]):
-            return sqrt((coord2[0] - coord1[0])**2 + (coord2[1] - coord2[1])**2)
+            return sqrt((coord2[0] - coord1[0])**2 + (coord2[1] - coord1[1])**2)
         
         #move the monsters one at a time
         monsters_to_remove = []
         for index, monster in self.monsters.items():
             valid_options = self._get_valid_options(monster)
-            #print(valid_options)
             #iterate until you get the minimum value(s)
             minimum_distance = float('inf') #set minimum distance to the max value
             minimum_values = []
@@ -83,6 +82,7 @@ class game_board():
                 potential_move = tuple(sum(values) for values in zip(monster.current_position, monster.movement_translator[option]))
                 act_man_distance = euclidean_distance(potential_move, self.act_man.current_position)
                 if act_man_distance < minimum_distance:
+                    #print(f"{option} {act_man_distance} {potential_move} {self.act_man.current_position}")
                     minimum_values = [option]
                     minimum_distance = act_man_distance
                 elif act_man_distance == minimum_distance:
@@ -90,7 +90,7 @@ class game_board():
             
             selected_move = None
             #if there is a tie, then get the minimum values
-            
+
             #basic assertion protection (check that value(s) were selected, monster type is ogre or demon)
             assert minimum_values, f"No valid moves for monster {monster}"
             assert monster.monster_type in ['G', 'D'], f"{monster} isn't a demon or ogre"
@@ -101,11 +101,8 @@ class game_board():
                 selected_move = minimum_values[0]
             elif monster.monster_type == 'D':
                 selected_move = minimum_values[-1]
-            #print(selected_move)
-            #print(monster.current_position)
             #move monster to new selected position
             monster.current_position = tuple(sum(values) for values in zip(monster.current_position, monster.movement_translator[selected_move]))
-            
             #check if any monsters, corpses or actman are in the new position
             #moved into act man
             if self.act_man.current_position == monster.current_position: self._kill_actman()
@@ -114,7 +111,6 @@ class game_board():
             elif self.grid[monster.current_position[0]][monster.current_position[1]] == '@': monsters_to_remove.append(index)
             
         #delete all monsters that hit a corpse
-        if monsters_to_remove: print(monsters_to_remove)
         [self._kill_monster(index) for index in monsters_to_remove]
         monsters_to_remove = []
         
@@ -202,7 +198,6 @@ class game_board():
         for row in row_range:
             if stop: break
             for col in col_range:
-                #print((row, col))
                 if self.grid[row][col] == '#':
                     stop = True
                     break
