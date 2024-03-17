@@ -59,22 +59,27 @@ class dungeon_game(game_board):
             if state['game_board'].game_state == 'defeat':
                 continue
             #did act man kill all the monsters (thereby winning)?
-            #is act man still alive after 7 turns (i.e. 6 turns plus this one)?
-            elif state['game_board'].game_state == 'victory' or state['game_board'].turn_count >= 7:
-                #print("Found a good move")
-                #print(state['current_move'])
+            elif state['game_board'].game_state == 'victory':
+                print(f"Found winning move {state['current_move']}")
                 selected_option = state['current_move']
                 break
+            #is act man still alive after 7 turns (i.e. 6 turns plus this one)?
+            #in case we aren't able to find a series of winning moves within 7 turns,
+            #get the last option where he survives 7 moves
+            elif state['game_board'].turn_count >= 7:
+                selected_option = state['initial_move']
+            #otherwise, keep adding the moves to the queue
             else:
               #get valid new options from this position, add to tail end of new options queue
               valid_new_options = state['game_board']._get_valid_options(state['game_board'].act_man)
               new_branch = [{"initial_move": state['current_move'], "current_move": new_option, 'game_board': deepcopy(state['game_board'])} for new_option in valid_new_options]
               queue.extend(new_branch)
 
-        #contingency if queue becomes empty and goal is not empty
+        #contingency if queue becomes empty and winning moveset not found
         else:
-            print("No good option found. Choosing option at random")
-            selected_option = random.choice(valid_options)
+            print("No good option found.")
+            #if there is no moveset where he survives 7 moves, make a random move
+            if not selected_option: selected_option = random.choice(valid_options)
 
         self._move_actman(move=selected_option)            
     
@@ -130,5 +135,5 @@ class dungeon_game(game_board):
     
 
 new_dungeon = dungeon_game()
-new_dungeon.play_game()
-#new_dungeon._play_turn()
+#new_dungeon.play_game()
+new_dungeon._play_turn()
