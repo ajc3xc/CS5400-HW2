@@ -2,6 +2,7 @@
 import os, sys
 from game_board import game_board
 import random
+from copy import deepcopy
     
 class dungeon_game(game_board):
     def __init__(self):
@@ -38,7 +39,7 @@ class dungeon_game(game_board):
         valid_options = self._get_valid_options(self.act_man)
 
         #data structure to store queue of options
-        queue = [{'initial_move': option, 'current_move': option, 'turns': 6, 'game_board': game_board(grid=self.grid, turn_count=self.turn_count, points=self.points, moves=self.moves)} for option in valid_options]
+        queue = [{'initial_move': option, 'current_move': option, 'game_board': game_board(grid=self.grid, turn_count=0, points=self.points, moves=self.moves)} for option in valid_options]
 
         #testing iterating through queue
         selected_option = None
@@ -46,26 +47,27 @@ class dungeon_game(game_board):
         #print(valid_options)
         #iterate through the loop until goal condition met or queue becomes empty
         while queue:
-            option: dict = queue.pop(0)
+            state: dict = queue.pop(0)
             #move act man and move the monsters
-            #print(option['game_board'].act_man.current_position)
-            option['game_board']._move_actman(option['current_move'])
-            #print(option['game_board'].act_man.current_position)
-            option['game_board']._move_monsters()
-            #print(len(option['game_board'].monsters))
+            state['game_board']._move_actman(state['current_move'])
+            state['game_board']._move_monsters()
+            #increment turn count by 1
+            state['game_board'].turn_count += 1
 
             #did act man die from doing this action?
-            if option['game_board'].game_state == 'defeat':
+            if state['game_board'].game_state == 'defeat':
                 continue
             #did act man kill all the monsters (thereby winning)?
             #is act man still alive after 7 turns (i.e. 6 turns plus this one)?
-            elif option['game_board'].game_state == 'victory' or option['turns'] == 6:
-                print("Found a good move")
-                print(option['current_move'])
-                selected_option = option['current_move']
+            elif state['game_board'].game_state == 'victory' or state['game_board'].turn_count >= 7:
+                #print("Found a good move")
+                #print(option['current_move'])
+                selected_option = state['current_move']
                 break
             else:
-                pass
+              valid_new_options = state['game_board']._get_valid_options(state['game_board'].act_man)
+              new_options = [{"initial_move": state['current_move'], "current_move": new_option, 'game_board': deepcopy(state['game_board'])} for new_option in valid_new_options]
+              print(new_options)
 
         #contingency if queue becomes empty and goal is not empty
         else:
@@ -126,5 +128,5 @@ class dungeon_game(game_board):
     
 
 new_dungeon = dungeon_game()
-new_dungeon.play_game()
-#new_dungeon._play_turn()
+#new_dungeon.play_game()
+new_dungeon._play_turn()

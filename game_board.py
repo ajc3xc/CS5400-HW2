@@ -82,7 +82,6 @@ class game_board():
             for option in valid_options:
                 potential_move = tuple(sum(values) for values in zip(monster.current_position, monster.movement_translator[option]))
                 act_man_distance = euclidean_distance(potential_move, self.act_man.current_position)
-                print(f"{option} {act_man_distance} {minimum_distance}")
                 if act_man_distance < minimum_distance:
                     minimum_values = [option]
                     minimum_distance = act_man_distance
