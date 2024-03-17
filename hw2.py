@@ -60,7 +60,7 @@ class dungeon_game(game_board):
                 continue
             #did act man kill all the monsters (thereby winning)?
             elif state['game_board'].game_state == "victory":
-                print(f"Found winning move {state['initial_move']}")
+                print(f"Found winning moveset {state['game_board'].moves}")
                 selected_option = state['initial_move']
                 break
             #is act man still alive after 7 turns (i.e. 6 turns plus this one)?
@@ -99,7 +99,7 @@ class dungeon_game(game_board):
         #in case act man killed by demons or demons get killed
         self.turn_count += 1
         #move act man
-        #self._choose_and_move_actman()
+        self._choose_and_move_actman()
         if self.game_state != "playing": return
         
         #move the monsters
@@ -135,5 +135,5 @@ class dungeon_game(game_board):
     
 
 new_dungeon = dungeon_game()
-#new_dungeon.play_game()
-new_dungeon._play_turn()
+new_dungeon.play_game()
+#new_dungeon._play_turn()
