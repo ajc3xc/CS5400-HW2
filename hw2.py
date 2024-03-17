@@ -60,8 +60,8 @@ class dungeon_game(game_board):
                 continue
             #did act man kill all the monsters (thereby winning)?
             elif state['game_board'].game_state == 'victory':
-                print(f"Found winning move {state['current_move']}")
-                selected_option = state['current_move']
+                print(f"Found winning move {state['initial_move']}")
+                selected_option = state['initial_move']
                 break
             #is act man still alive after 7 turns (i.e. 6 turns plus this one)?
             #in case we aren't able to find a series of winning moves within 7 turns,
@@ -72,7 +72,7 @@ class dungeon_game(game_board):
             else:
               #get valid new options from this position, add to tail end of new options queue
               valid_new_options = state['game_board']._get_valid_options(state['game_board'].act_man)
-              new_branch = [{"initial_move": state['current_move'], "current_move": new_option, 'game_board': deepcopy(state['game_board'])} for new_option in valid_new_options]
+              new_branch = [{"initial_move": state['initial_move'], "current_move": new_option, 'game_board': deepcopy(state['game_board'])} for new_option in valid_new_options]
               queue.extend(new_branch)
 
         #contingency if queue becomes empty and winning moveset not found
